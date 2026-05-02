@@ -14,7 +14,149 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      credentials: {
+        Row: {
+          created_at: string
+          credential_hash: string | null
+          credential_type: string
+          expires_at: string | null
+          id: string
+          issued_at: string | null
+          issuer: string
+          status: Database["public"]["Enums"]["credential_status"]
+          subject: Json
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          credential_hash?: string | null
+          credential_type?: string
+          expires_at?: string | null
+          id?: string
+          issued_at?: string | null
+          issuer?: string
+          status?: Database["public"]["Enums"]["credential_status"]
+          subject?: Json
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          credential_hash?: string | null
+          credential_type?: string
+          expires_at?: string | null
+          id?: string
+          issued_at?: string | null
+          issuer?: string
+          status?: Database["public"]["Enums"]["credential_status"]
+          subject?: Json
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          bio: string | null
+          created_at: string
+          display_name: string
+          github_username: string | null
+          id: string
+          updated_at: string
+          webhook_secret: string | null
+          webhook_url: string | null
+        }
+        Insert: {
+          bio?: string | null
+          created_at?: string
+          display_name?: string
+          github_username?: string | null
+          id: string
+          updated_at?: string
+          webhook_secret?: string | null
+          webhook_url?: string | null
+        }
+        Update: {
+          bio?: string | null
+          created_at?: string
+          display_name?: string
+          github_username?: string | null
+          id?: string
+          updated_at?: string
+          webhook_secret?: string | null
+          webhook_url?: string | null
+        }
+        Relationships: []
+      }
+      verification_logs: {
+        Row: {
+          created_at: string
+          credential_id: string
+          details: Json | null
+          id: string
+          result: Database["public"]["Enums"]["verification_result"]
+          verifier_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          credential_id: string
+          details?: Json | null
+          id?: string
+          result: Database["public"]["Enums"]["verification_result"]
+          verifier_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          credential_id?: string
+          details?: Json | null
+          id?: string
+          result?: Database["public"]["Enums"]["verification_result"]
+          verifier_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "verification_logs_credential_id_fkey"
+            columns: ["credential_id"]
+            isOneToOne: false
+            referencedRelation: "credentials"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      webhook_logs: {
+        Row: {
+          delivered_at: string
+          error: string | null
+          event_type: string
+          id: string
+          payload: Json
+          response_body: string | null
+          status_code: number | null
+          user_id: string
+        }
+        Insert: {
+          delivered_at?: string
+          error?: string | null
+          event_type: string
+          id?: string
+          payload?: Json
+          response_body?: string | null
+          status_code?: number | null
+          user_id: string
+        }
+        Update: {
+          delivered_at?: string
+          error?: string | null
+          event_type?: string
+          id?: string
+          payload?: Json
+          response_body?: string | null
+          status_code?: number | null
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -23,7 +165,8 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      credential_status: "pending" | "verified" | "revoked"
+      verification_result: "valid" | "invalid" | "expired" | "revoked"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +293,9 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      credential_status: ["pending", "verified", "revoked"],
+      verification_result: ["valid", "invalid", "expired", "revoked"],
+    },
   },
 } as const
