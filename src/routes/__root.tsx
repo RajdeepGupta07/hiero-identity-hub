@@ -1,6 +1,16 @@
-import { Outlet, Link, createRootRoute, HeadContent, Scripts } from "@tanstack/react-router";
+import { Outlet, Link, createRootRoute, HeadContent, Scripts, useLocation } from "@tanstack/react-router";
+import { ClientOnly } from "@tanstack/react-router";
 
 import appCss from "../styles.css?url";
+
+function InterFont() {
+  return (
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+  );
+}
 
 function NotFoundComponent() {
   return (
@@ -29,16 +39,20 @@ export const Route = createRootRoute({
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
-      { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { title: "Hiero — Contributor Identity Verification" },
+      { name: "description", content: "Decentralized identity verification for open-source contributors using verifiable credentials." },
+      { name: "author", content: "Hiero" },
+      { property: "og:title", content: "Hiero — Contributor Identity Verification" },
+      { property: "og:description", content: "Decentralized identity verification for open-source contributors." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
     ],
     links: [
+      {
+        rel: "preconnect",
+        href: "https://fonts.googleapis.com",
+      },
       {
         rel: "stylesheet",
         href: appCss,
@@ -55,6 +69,7 @@ function RootShell({ children }: { children: React.ReactNode }) {
     <html lang="en">
       <head>
         <HeadContent />
+        <InterFont />
       </head>
       <body>
         {children}
