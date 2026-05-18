@@ -122,6 +122,25 @@ export const getVerificationLogs = createServerFn({ method: "GET" })
     return data;
   });
 
+export const revokeCredential = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: unknown) =>
+    z.object({ credential_id: z.string().uuid() }).parse(data)
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const { data: cred, error } = await supabase
+      .from("credentials")
+      .update({ status: "revoked" })
+      .eq("id", data.credential_id)
+      .eq("user_id", userId)
+      .select()
+      .single();
+    if (error) throw new Error(error.message);
+    return cred;
+  });
+
+
 // SSRF-safe webhook trigger
 async function triggerWebhook({ data, context }: { data: { credential_id: string }; context: { supabase: any; userId: string } }) {
   const { supabase, userId } = context;
