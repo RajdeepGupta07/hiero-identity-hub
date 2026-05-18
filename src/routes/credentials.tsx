@@ -1,12 +1,12 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Plus, Search, Copy, CheckCircle } from "lucide-react";
+import { Plus, Search, Copy, CheckCircle, Ban, Share2 } from "lucide-react";
 import { Navbar } from "@/components/Navbar";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { issueCredential, verifyCredential, getMyCredentials } from "@/server/identity.functions";
+import { issueCredential, verifyCredential, getMyCredentials, revokeCredential } from "@/server/identity.functions";
 
 export const Route = createFileRoute("/credentials")({
   head: () => ({
@@ -76,6 +76,23 @@ function CredentialsPage() {
   const copyHash = (hash: string) => {
     navigator.clipboard.writeText(hash);
     setCopiedId(hash);
+    setTimeout(() => setCopiedId(null), 2000);
+  };
+
+  const handleRevoke = async (id: string) => {
+    if (!confirm("Revoke this credential? This cannot be undone.")) return;
+    try {
+      await revokeCredential({ data: { credential_id: id } });
+      loadCredentials();
+    } catch (err: any) {
+      alert(err.message);
+    }
+  };
+
+  const shareLink = (hash: string) => {
+    const url = `${window.location.origin}/verify/${hash}`;
+    navigator.clipboard.writeText(url);
+    setCopiedId("share-" + hash);
     setTimeout(() => setCopiedId(null), 2000);
   };
 
@@ -176,6 +193,14 @@ function CredentialsPage() {
                       <button onClick={() => copyHash(cred.credential_hash)} className="text-muted-foreground hover:text-foreground transition-colors">
                         {copiedId === cred.credential_hash ? <CheckCircle className="w-3.5 h-3.5 text-primary" /> : <Copy className="w-3.5 h-3.5" />}
                       </button>
+                      <button onClick={() => shareLink(cred.credential_hash)} title="Copy public verify link" className="text-muted-foreground hover:text-foreground transition-colors">
+                        {copiedId === "share-" + cred.credential_hash ? <CheckCircle className="w-3.5 h-3.5 text-primary" /> : <Share2 className="w-3.5 h-3.5" />}
+                      </button>
+                      {cred.status !== "revoked" && (
+                        <button onClick={() => handleRevoke(cred.id)} title="Revoke credential" className="text-muted-foreground hover:text-destructive transition-colors ml-auto">
+                          <Ban className="w-3.5 h-3.5" />
+                        </button>
+                      )}
                     </div>
                   )}
                 </div>
